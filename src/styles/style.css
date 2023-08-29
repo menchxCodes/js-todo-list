@@ -24,7 +24,8 @@ body {
 }
 
 .task,
-.temp-task {
+.temp-task,
+dialog input {
   box-sizing: border-box;
   font-size: 0.8em;
   border: none;
@@ -46,4 +47,9 @@ body {
 .task-item {
   display: flex;
   justify-content: space-between;
+}
+
+.task-details {
+  display: flex;
+  flex-direction: column;
 }

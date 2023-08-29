@@ -158,6 +158,11 @@ const domHandler = (function () {
       }
     });
 
+    let detailsBtn = taskButtons["details-button"];
+    detailsBtn.addEventListener("click", function (e) {
+      renderTaskDialog(task);
+    });
+
     let deleteBtn = taskButtons["delete-button"];
     deleteBtn.addEventListener("click", function () {
       project.removeTodoFromList(task);
@@ -168,6 +173,139 @@ const domHandler = (function () {
     taskContainer.appendChild(taskButtons["button-group"]);
 
     return taskContainer;
+  };
+
+  const renderTaskDialog = function (task) {
+    let dialog = document.createElement("dialog");
+    dialog.classList.add("task-dialog");
+
+    let taskDetails = document.createElement("div");
+    taskDetails.classList.add("task-details");
+
+    let taskTitle = document.createElement("input");
+    taskTitle.value = task.title;
+    taskTitle.classList.add("dialog-title");
+
+    let taskDescription = document.createElement("textarea");
+    taskDescription.value = task.description;
+    taskDescription.classList.add("dialog-description");
+
+    let taskDueDate = document.createElement("input");
+    taskDueDate.type = "date";
+    taskDueDate.value = task.dueDate;
+    taskDueDate.classList.add("dialog-dueDate");
+
+    let taskPriority = document.createElement("select");
+
+    let prioLow = document.createElement("option");
+    prioLow.value = "low";
+    prioLow.textContent = "low";
+
+    let prioNormal = document.createElement("option");
+    prioNormal.value = "normal";
+    prioNormal.textContent = "normal";
+
+    let prioHigh = document.createElement("option");
+    prioHigh.value = "high";
+    prioHigh.textContent = "high";
+
+    taskPriority.appendChild(prioLow);
+    taskPriority.appendChild(prioNormal);
+    taskPriority.appendChild(prioHigh);
+
+    taskPriority.value = task.priority;
+    taskPriority.classList.add("dialog-priority");
+
+    taskDetails.appendChild(taskTitle);
+    taskDetails.appendChild(taskDescription);
+    taskDetails.appendChild(taskDueDate);
+    taskDetails.appendChild(taskPriority);
+
+    let closeBtn = document.createElement("button");
+    closeBtn.classList.add("dialog-close-btn");
+    closeBtn.textContent = "Close";
+
+    closeBtn.addEventListener("click", function () {
+      dialogSaveClose(
+        task,
+        dialog,
+        taskTitle,
+        taskDescription,
+        taskDueDate,
+        taskPriority
+      );
+    });
+
+    dialog.addEventListener("click", function (e) {
+      const dialogDimensions = dialog.getBoundingClientRect();
+      if (
+        e.clientX < dialogDimensions.left ||
+        e.clientX > dialogDimensions.right ||
+        e.clientY < dialogDimensions.top ||
+        e.clientY > dialogDimensions.bottom
+      ) {
+        dialogSaveClose(
+          task,
+          dialog,
+          taskTitle,
+          taskDescription,
+          taskDueDate,
+          taskPriority
+        );
+      }
+    });
+
+    dialog.append(taskDetails);
+    dialog.append(closeBtn);
+
+    document.body.appendChild(dialog);
+    dialog.showModal();
+    console.log(dialog);
+  };
+
+  const dialogSaveClose = function (
+    task,
+    dialog,
+    taskTitle,
+    taskDescription,
+    taskDueDate,
+    taskPriority
+  ) {
+    let newTask = new Todo(
+      taskTitle.value,
+      taskDescription.value,
+      taskDueDate.value,
+      taskPriority.value
+    );
+
+    console.log(newTask);
+
+    if (todoValidator.validate(newTask)) {
+      task.title = newTask.title;
+      task.description = newTask.description;
+      task.dueDate = newTask.dueDate;
+      task.priority = newTask.priority;
+
+      console.log(`${task} updated successfully.`);
+      console.log(task, newTask);
+      dialog.close();
+    } else {
+      console.log("failed to update task");
+      dialog.close();
+    }
+    renderPage();
+  };
+
+  const dialogClickOOB = function (e) {
+    const dialogDimensions = dialog.getBoundingClientRect();
+    if (
+      e.clientX < dialogDimensions.left ||
+      e.clientX > dialogDimensions.right ||
+      e.clientY < dialogDimensions.top ||
+      e.clientY > dialogDimensions.bottom
+    ) {
+      dialog.close();
+    }
   };
 
   const renderProjects = function () {

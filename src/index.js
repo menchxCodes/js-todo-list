@@ -8,9 +8,9 @@ import { projects } from "./scripts/class/projects";
 
 // console.log("hello");
 const task1 = new Todo("invalid date", "this is a stask", "asd", "high");
-const task2 = new Todo("valid task", "this is a disc", "1994");
-const task3 = new Todo("Aboozabi", "this is a disc", "1994");
-const task4 = new Todo("Kesafat", "this is a disc", "1994");
+const task2 = new Todo("valid task", "this is a disc", "1996-08-30");
+const task3 = new Todo("Aboozabi", "this is a disc", "2000-02-23");
+const task4 = new Todo("Kesafat", "this is a disc", "2013-03-13");
 
 projects.projects[0].addTodoToList(task1);
 projects.projects[0].addTodoToList(task2);
