@@ -79,6 +79,16 @@ const domHandler = (function () {
     newTaskBtn.classList.add("new-task-btn");
     newTaskBtn.textContent = "New Task";
 
+    hookNewTaskEvent(project, tasksContainer, newTaskBtn);
+    tasksContainer.appendChild(newTaskBtn);
+
+    projectDiv.appendChild(projectName);
+    projectDiv.appendChild(tasksContainer);
+
+    return projectDiv;
+  };
+
+  const hookNewTaskEvent = function (project, tasksContainer, newTaskBtn) {
     newTaskBtn.addEventListener("click", function (e) {
       newTaskBtn.classList.add("hidden");
       let taskDiv = document.createElement("input");
@@ -100,21 +110,9 @@ const domHandler = (function () {
       });
       tasksContainer.insertBefore(taskDiv, tasksContainer.lastChild);
     });
-    tasksContainer.appendChild(newTaskBtn);
-
-    projectDiv.appendChild(projectName);
-    projectDiv.appendChild(tasksContainer);
-
-    return projectDiv;
   };
 
-  const renderTask = function (project, task) {
-    let taskContainer = document.createElement("li");
-    taskContainer.classList.add("task-item");
-
-    let taskItem = document.createElement("input");
-    taskItem.classList.add("task");
-
+  const renderTaskButtons = function () {
     let taskButtons = document.createElement("div");
     taskButtons.classList.add("task-buttons");
 
@@ -129,6 +127,22 @@ const domHandler = (function () {
     taskButtons.appendChild(detailsBtn);
     taskButtons.appendChild(deleteBtn);
 
+    return {
+      "button-group": taskButtons,
+      "details-button": detailsBtn,
+      "delete-button": deleteBtn,
+    };
+  };
+
+  const renderTask = function (project, task) {
+    let taskContainer = document.createElement("li");
+    taskContainer.classList.add("task-item");
+
+    let taskItem = document.createElement("input");
+    taskItem.classList.add("task");
+
+    let taskButtons = renderTaskButtons();
+
     taskItem.value = task.title;
 
     taskItem.addEventListener("change", function (e) {
@@ -136,6 +150,7 @@ const domHandler = (function () {
       if (todoValidator.validate(newTask)) {
         task.title = this.value;
         document.activeElement?.blur();
+        console.log("successfully updated " + task);
         // renderPage();
       } else {
         this.value = task.title;
@@ -143,13 +158,14 @@ const domHandler = (function () {
       }
     });
 
+    let deleteBtn = taskButtons["delete-button"];
     deleteBtn.addEventListener("click", function () {
       project.removeTodoFromList(task);
       renderPage();
     });
 
     taskContainer.appendChild(taskItem);
-    taskContainer.appendChild(taskButtons);
+    taskContainer.appendChild(taskButtons["button-group"]);
 
     return taskContainer;
   };
