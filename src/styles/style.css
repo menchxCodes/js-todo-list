@@ -1,0 +1,40 @@
+body {
+  background-color: olive;
+  font-size: 24px;
+}
+
+.current-project {
+  font-weight: bold;
+}
+
+.projects-container {
+  background-color: aliceblue;
+}
+
+.project-name:hover {
+  cursor: pointer;
+  color: blue;
+}
+
+.tasks-container {
+  margin-left: 0.5em auto;
+}
+
+.task {
+  box-sizing: border-box;
+  font-size: 0.8em;
+  border: none;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  width: 95%;
+  text-overflow: ellipsis;
+  margin: 0.25em 0.5em;
+  padding: 0.25em;
+}
+
+.task:focus {
+  font-style: italic;
+  color: rgba(0, 0, 0, 0.65);
+  outline: none;
+  border: 1px solid rgba(0, 0, 0, 0.65);
+}
