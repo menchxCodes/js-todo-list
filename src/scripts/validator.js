@@ -11,7 +11,7 @@ const todoValidator = (function () {
   };
 
   const validateTitle = function (titleInput) {
-    if (titleInput != undefined && titleInput != "") {
+    if (titleInput != undefined && titleInput.trim() != "") {
       return true;
     } else {
       return false;
@@ -29,7 +29,7 @@ const todoValidator = (function () {
 
 const projectValidator = (function () {
   const validateName = function (projectName) {
-    if (projectName != undefined && projectName != "") {
+    if (projectName != undefined && projectName.trim() != "") {
       return true;
     } else {
       return false;

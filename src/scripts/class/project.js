@@ -17,6 +17,12 @@ class Project {
       return console.log(`invalid todoItem ${todoItem}`);
     }
   }
+
+  removeTodoFromList(todoItem) {
+    this.list.splice(this.list.indexOf(todoItem), 1);
+    console.log(`successfully removed ${todoItem} from ${this.name}`);
+    return this.list;
+  }
 }
 
 export default Project;

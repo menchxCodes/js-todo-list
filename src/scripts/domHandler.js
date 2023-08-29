@@ -58,28 +58,48 @@ const domHandler = (function () {
     document.body.appendChild(projectsContainer);
   };
 
-  const renderProject = function (project, index) {
+  const renderProject = function (project) {
     let projectDiv = document.createElement("div");
     projectDiv.classList.add("project");
 
     let projectName = document.createElement("div");
     projectName.classList.add("project-name");
-    if (project == projects.currentProject) {
-      projectName.classList.add("current-project");
-    }
+
     projectName.textContent = `${project.name}`;
 
     let tasksContainer = document.createElement("ol");
     tasksContainer.classList.add("tasks-container");
 
-    project.list.forEach((task, index) => {
-      let taskDiv = renderTask(task, index);
+    project.list.forEach((task) => {
+      let taskDiv = renderTask(project, task);
       tasksContainer.appendChild(taskDiv);
     });
 
     const newTaskBtn = document.createElement("button");
-    newTaskBtn.id = "new-task-btn";
+    newTaskBtn.classList.add("new-task-btn");
     newTaskBtn.textContent = "New Task";
+
+    newTaskBtn.addEventListener("click", function (e) {
+      newTaskBtn.classList.add("hidden");
+      let taskDiv = document.createElement("input");
+      taskDiv.classList.add("temp-task");
+
+      taskDiv.addEventListener("change", function (e) {
+        let newTask = new Todo(
+          this.value,
+          "",
+          format(Date.now(), "yyyy-MM-dd")
+        );
+        if (todoValidator.validate(newTask)) {
+          project.addTodoToList(newTask);
+
+          renderPage();
+        } else {
+          renderPage();
+        }
+      });
+      tasksContainer.insertBefore(taskDiv, tasksContainer.lastChild);
+    });
     tasksContainer.appendChild(newTaskBtn);
 
     projectDiv.appendChild(projectName);
@@ -88,16 +108,48 @@ const domHandler = (function () {
     return projectDiv;
   };
 
-  const renderTask = function (task, index) {
+  const renderTask = function (project, task) {
     let taskContainer = document.createElement("li");
     taskContainer.classList.add("task-item");
 
     let taskItem = document.createElement("input");
     taskItem.classList.add("task");
 
+    let taskButtons = document.createElement("div");
+    taskButtons.classList.add("task-buttons");
+
+    let detailsBtn = document.createElement("button");
+    detailsBtn.classList.add("details-btn");
+    detailsBtn.textContent = "details";
+
+    let deleteBtn = document.createElement("button");
+    deleteBtn.classList.add("delete-btn");
+    deleteBtn.textContent = "delete";
+
+    taskButtons.appendChild(detailsBtn);
+    taskButtons.appendChild(deleteBtn);
+
     taskItem.value = task.title;
 
+    taskItem.addEventListener("change", function (e) {
+      let newTask = new Todo(this.value, "", format(Date.now(), "yyyy-MM-dd"));
+      if (todoValidator.validate(newTask)) {
+        task.title = this.value;
+        document.activeElement?.blur();
+        // renderPage();
+      } else {
+        this.value = task.title;
+        console.log("invalid new task");
+      }
+    });
+
+    deleteBtn.addEventListener("click", function () {
+      project.removeTodoFromList(task);
+      renderPage();
+    });
+
     taskContainer.appendChild(taskItem);
+    taskContainer.appendChild(taskButtons);
 
     return taskContainer;
   };
@@ -106,8 +158,8 @@ const domHandler = (function () {
     const projectsContainer = document.querySelector(".projects-container");
     projectsContainer.replaceChildren();
 
-    projects.projects.forEach((project, index) => {
-      let projectDiv = renderProject(project, index);
+    projects.projects.forEach((project) => {
+      let projectDiv = renderProject(project);
       projectsContainer.appendChild(projectDiv);
     });
 
@@ -117,35 +169,14 @@ const domHandler = (function () {
     projectsContainer.appendChild(newProjectBtn);
   };
 
-  const createEvents = function () {
-    const sumbitButton = document.getElementById("submit-btn");
-    const inputForm = document.getElementById("input-form");
-
-    inputForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      const data = new FormData(inputForm);
-
-      let title = data.get("input-title");
-      let desc = data.get("input-description");
-      let date = data.get("input-dueDate");
-
-      let todoItem = new Todo(title, desc, date);
-      let currentProject = projects.currentProject;
-      currentProject.addTodoToList(todoItem);
-
-      renderProjects();
-    });
-  };
-
   const createPage = function () {
-    createForm();
-    createEvents();
     createProjects();
-    renderProjects();
   };
 
   const renderPage = function () {
     renderProjects();
+
+    console.log(projects);
   };
   return { createPage, renderPage };
 })();

@@ -17,6 +17,7 @@ projects.projects[0].addTodoToList(task2);
 projects.projects[0].addTodoToList(task3);
 projects.projects[0].addTodoToList(task4);
 const p2 = new Project("Shopping List");
+projects.addProject(p2);
 
 console.log(projects.currentProject);
 
