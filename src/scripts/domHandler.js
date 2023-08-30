@@ -170,8 +170,8 @@ const domHandler = (function () {
     ]);
 
     let btnGroup = dom.create(taskContainer, "div", ".dialog-button-group");
-    let saveBtn = dom.create(btnGroup, "button", "dialog-save-btn", "Save");
     let closeBtn = dom.create(btnGroup, "button", "dialog-delete-btn", "Close");
+    let saveBtn = dom.create(btnGroup, "button", "dialog-save-btn", "Save");
 
     saveBtn.addEventListener("click", function (e) {
       dialogSaveEvent(task, dialog, taskContainer);
