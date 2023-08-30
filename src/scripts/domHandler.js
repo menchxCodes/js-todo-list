@@ -3,41 +3,41 @@ import Project from "./class/project";
 import { Projects, projects } from "./class/projects";
 import format from "date-fns/format";
 import { projectValidator, todoValidator } from "./validator";
+import { dom } from "./domHelpers";
 
 const domHandler = (function () {
   const createProjects = function () {
-    const projectsContainer = document.createElement("div");
-    projectsContainer.classList.add("projects-container");
-
-    document.body.appendChild(projectsContainer);
+    const projectsContainer = dom.create(
+      document.body,
+      "div",
+      ".projects-container"
+    );
   };
 
   const renderProject = function (project) {
-    let projectDiv = document.createElement("div");
-    projectDiv.classList.add("project");
+    let projectDiv = dom.create("", "div", ".project");
+    let projectName = dom.create(
+      projectDiv,
+      "div",
+      ".project-name",
+      project.name
+    );
 
-    let projectName = document.createElement("div");
-    projectName.classList.add("project-name");
-
-    projectName.textContent = `${project.name}`;
-
-    let tasksContainer = document.createElement("ol");
-    tasksContainer.classList.add("tasks-container");
+    let tasksContainer = dom.create(projectDiv, "div", ".tasks-container");
 
     project.list.forEach((task) => {
       let taskDiv = renderTask(project, task);
       tasksContainer.appendChild(taskDiv);
     });
 
-    const newTaskBtn = document.createElement("button");
-    newTaskBtn.classList.add("new-task-btn");
-    newTaskBtn.textContent = "New Task";
+    let newTaskBtn = dom.create(
+      tasksContainer,
+      "button",
+      ".new-task-btn",
+      "New Task"
+    );
 
     hookNewTaskEvent(project, tasksContainer, newTaskBtn);
-    tasksContainer.appendChild(newTaskBtn);
-
-    projectDiv.appendChild(projectName);
-    projectDiv.appendChild(tasksContainer);
 
     return projectDiv;
   };
@@ -68,19 +68,14 @@ const domHandler = (function () {
   };
 
   const renderTaskButtons = function () {
-    let taskButtons = document.createElement("div");
-    taskButtons.classList.add("task-buttons");
-
-    let detailsBtn = document.createElement("button");
-    detailsBtn.classList.add("details-btn");
-    detailsBtn.textContent = "details";
-
-    let deleteBtn = document.createElement("button");
-    deleteBtn.classList.add("delete-btn");
-    deleteBtn.textContent = "delete";
-
-    taskButtons.appendChild(detailsBtn);
-    taskButtons.appendChild(deleteBtn);
+    let taskButtons = dom.create("", "div", ".task-buttons");
+    let detailsBtn = dom.create(
+      taskButtons,
+      "button",
+      "details-btn",
+      "details"
+    );
+    let deleteBtn = dom.create(taskButtons, "button", "delete-btn", "delete");
 
     return {
       "button-group": taskButtons,
