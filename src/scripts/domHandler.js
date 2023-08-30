@@ -2,7 +2,7 @@ import Todo from "./class/todo";
 import Project from "./class/project";
 import { Projects, projects } from "./class/projects";
 import format from "date-fns/format";
-import { todoValidator } from "./validator";
+import { projectValidator, todoValidator } from "./validator";
 
 const domHandler = (function () {
   const createProjects = function () {
@@ -265,7 +265,45 @@ const domHandler = (function () {
     const newProjectBtn = document.createElement("button");
     newProjectBtn.id = "new-project-btn";
     newProjectBtn.textContent = "New Project";
+
+    newProjectBtn.addEventListener("click", function (e) {
+      newProjectDialog();
+    });
     projectsContainer.appendChild(newProjectBtn);
+  };
+
+  const newProjectDialog = function () {
+    let dialog = document.createElement("dialog");
+    dialog.id = "new-project-dialog";
+    document.body.appendChild(dialog);
+
+    dialog.showModal();
+
+    let projectNameLabel = document.createElement("label");
+    projectNameLabel.setAttribute("for", "new-project-input");
+    projectNameLabel.textContent = "Project Name:";
+
+    let projectNameInput = document.createElement("input");
+    projectNameInput.id = "new-project-input";
+
+    let dialogCloseBtn = document.createElement("button");
+    dialogCloseBtn.classList.add("dialog-close-btn");
+    dialogCloseBtn.textContent = "Save";
+
+    dialog.appendChild(projectNameLabel);
+    dialog.appendChild(projectNameInput);
+    dialog.appendChild(dialogCloseBtn);
+
+    projectNameInput.focus();
+
+    dialogCloseBtn.addEventListener("click", function (e) {
+      let newProject = new Project(projectNameInput.value);
+      if (projectValidator.validate(newProject)) {
+        projects.addProject(newProject);
+        dialog.close();
+        renderPage();
+      }
+    });
   };
 
   const createPage = function () {
