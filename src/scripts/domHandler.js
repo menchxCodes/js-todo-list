@@ -23,7 +23,7 @@ const domHandler = (function () {
       project.name
     );
 
-    let tasksContainer = dom.create(projectDiv, "div", ".tasks-container");
+    let tasksContainer = dom.create(projectDiv, "ol", ".tasks-container");
 
     project.list.forEach((task) => {
       let taskDiv = renderTask(project, task);
@@ -48,6 +48,13 @@ const domHandler = (function () {
       let taskDiv = document.createElement("input");
       taskDiv.classList.add("temp-task");
 
+      let taskLabel = dom.create(
+        "",
+        "label",
+        ".new-task-label",
+        "enter task name"
+      );
+
       taskDiv.addEventListener("change", function (e) {
         let newTask = new Todo(
           this.value,
@@ -63,18 +70,14 @@ const domHandler = (function () {
         }
       });
       tasksContainer.insertBefore(taskDiv, tasksContainer.lastChild);
+      tasksContainer.insertBefore(taskLabel, tasksContainer.lastChild);
       taskDiv.focus();
     });
   };
 
   const renderTaskButtons = function () {
     let taskButtons = dom.create("", "div", ".task-buttons");
-    let detailsBtn = dom.create(
-      taskButtons,
-      "button",
-      "details-btn",
-      "details"
-    );
+    let detailsBtn = dom.create(taskButtons, "button", "details-btn", "view");
     let deleteBtn = dom.create(taskButtons, "button", "delete-btn", "delete");
 
     return {
@@ -111,7 +114,7 @@ const domHandler = (function () {
     let detailsBtn = taskButtons["details-button"];
     detailsBtn.addEventListener("click", function (e) {
       // renderTaskDialog(task);
-      testRenderDialog(task);
+      renderDialog(task);
     });
 
     let deleteBtn = taskButtons["delete-button"];
@@ -127,7 +130,7 @@ const domHandler = (function () {
 
     return taskContainer;
   };
-  const testRenderDialog = function (task) {
+  const renderDialog = function (task) {
     let dialog = document.createElement("dialog");
 
     let taskTitle = dom.createInputLabel(
@@ -213,19 +216,6 @@ const domHandler = (function () {
     }
   };
 
-  const outOfBoundsEvent = function (dialog) {
-    dialog.addEventListener("click", function (e) {
-      const dialogDimensions = dialog.getBoundingClientRect();
-      if (
-        e.clientX < dialogDimensions.left ||
-        e.clientX > dialogDimensions.right ||
-        e.clientY < dialogDimensions.top ||
-        e.clientY > dialogDimensions.bottom
-      ) {
-        dialog.close();
-      }
-    });
-  };
   const renderProjects = function () {
     const projectsContainer = document.querySelector(".projects-container");
     projectsContainer.replaceChildren();
@@ -246,37 +236,78 @@ const domHandler = (function () {
   };
 
   const newProjectDialog = function () {
-    let dialog = document.createElement("dialog");
-    dialog.id = "new-project-dialog";
-    document.body.appendChild(dialog);
+    // let dialog = document.createElement("dialog");
+    // dialog.id = "new-project-dialog";
 
-    dialog.showModal();
+    // let projectNameLabel = document.createElement("label");
+    // projectNameLabel.setAttribute("for", "new-project-input");
+    // projectNameLabel.textContent = "Project Name:";
 
-    let projectNameLabel = document.createElement("label");
-    projectNameLabel.setAttribute("for", "new-project-input");
-    projectNameLabel.textContent = "Project Name:";
+    // let projectNameInput = document.createElement("input");
+    // projectNameInput.id = "new-project-input";
 
-    let projectNameInput = document.createElement("input");
-    projectNameInput.id = "new-project-input";
+    // let dialogCloseBtn = document.createElement("button");
+    // dialogCloseBtn.classList.add("dialog-close-btn");
+    // dialogCloseBtn.textContent = "Save";
 
-    let dialogCloseBtn = document.createElement("button");
-    dialogCloseBtn.classList.add("dialog-close-btn");
-    dialogCloseBtn.textContent = "Save";
+    // dialog.appendChild(projectNameLabel);
+    // dialog.appendChild(projectNameInput);
+    // dialog.appendChild(dialogCloseBtn);
 
-    dialog.appendChild(projectNameLabel);
-    dialog.appendChild(projectNameInput);
-    dialog.appendChild(dialogCloseBtn);
+    let dialog = dom.create(document.body, "dialog", "#new-project-dialog");
+    let newProjectContainer = dom.create(
+      dialog,
+      "div",
+      ".new-project-container"
+    );
 
-    projectNameInput.focus();
+    let projectName = dom.createInputLabel("text", "", "New project name:");
+    dom.appendChildren(newProjectContainer, [
+      projectName.label,
+      projectName.input,
+    ]);
+    let dialogSaveBtn = dom.create(
+      newProjectContainer,
+      "button",
+      "new-project-save",
+      "Save"
+    );
 
-    dialogCloseBtn.addEventListener("click", function (e) {
-      let newProject = new Project(projectNameInput.value);
+    projectName.input.focus();
+
+    dialogSaveBtn.addEventListener("click", function (e) {
+      let newProject = new Project(projectName.input.value);
       if (projectValidator.validate(newProject)) {
         projects.addProject(newProject);
         dialog.close();
         renderPage();
       }
+      dialog.close();
     });
+
+    projectName.input.addEventListener("change", function () {
+      let newProject = new Project(projectName.input.value);
+      if (projectValidator.validate(newProject)) {
+        projects.addProject(newProject);
+        dialog.close();
+        renderPage();
+      }
+      dialog.close();
+    });
+
+    dialog.addEventListener("click", (e) => {
+      const dialogDimensions = dialog.getBoundingClientRect();
+      if (
+        e.clientX < dialogDimensions.left ||
+        e.clientX > dialogDimensions.right ||
+        e.clientY < dialogDimensions.top ||
+        e.clientY > dialogDimensions.bottom
+      ) {
+        dialog.close();
+      }
+    });
+
+    dialog.showModal();
   };
 
   const createPage = function () {
