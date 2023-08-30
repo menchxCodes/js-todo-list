@@ -3,41 +3,41 @@ import Project from "./class/project";
 import { Projects, projects } from "./class/projects";
 import format from "date-fns/format";
 import { projectValidator, todoValidator } from "./validator";
+import { dom } from "./domHelpers";
 
 const domHandler = (function () {
   const createProjects = function () {
-    const projectsContainer = document.createElement("div");
-    projectsContainer.classList.add("projects-container");
-
-    document.body.appendChild(projectsContainer);
+    const projectsContainer = dom.create(
+      document.body,
+      "div",
+      ".projects-container"
+    );
   };
 
   const renderProject = function (project) {
-    let projectDiv = document.createElement("div");
-    projectDiv.classList.add("project");
+    let projectDiv = dom.create("", "div", ".project");
+    let projectName = dom.create(
+      projectDiv,
+      "div",
+      ".project-name",
+      project.name
+    );
 
-    let projectName = document.createElement("div");
-    projectName.classList.add("project-name");
-
-    projectName.textContent = `${project.name}`;
-
-    let tasksContainer = document.createElement("ol");
-    tasksContainer.classList.add("tasks-container");
+    let tasksContainer = dom.create(projectDiv, "div", ".tasks-container");
 
     project.list.forEach((task) => {
       let taskDiv = renderTask(project, task);
       tasksContainer.appendChild(taskDiv);
     });
 
-    const newTaskBtn = document.createElement("button");
-    newTaskBtn.classList.add("new-task-btn");
-    newTaskBtn.textContent = "New Task";
+    let newTaskBtn = dom.create(
+      tasksContainer,
+      "button",
+      ".new-task-btn",
+      "New Task"
+    );
 
     hookNewTaskEvent(project, tasksContainer, newTaskBtn);
-    tasksContainer.appendChild(newTaskBtn);
-
-    projectDiv.appendChild(projectName);
-    projectDiv.appendChild(tasksContainer);
 
     return projectDiv;
   };
@@ -68,19 +68,14 @@ const domHandler = (function () {
   };
 
   const renderTaskButtons = function () {
-    let taskButtons = document.createElement("div");
-    taskButtons.classList.add("task-buttons");
-
-    let detailsBtn = document.createElement("button");
-    detailsBtn.classList.add("details-btn");
-    detailsBtn.textContent = "details";
-
-    let deleteBtn = document.createElement("button");
-    deleteBtn.classList.add("delete-btn");
-    deleteBtn.textContent = "delete";
-
-    taskButtons.appendChild(detailsBtn);
-    taskButtons.appendChild(deleteBtn);
+    let taskButtons = dom.create("", "div", ".task-buttons");
+    let detailsBtn = dom.create(
+      taskButtons,
+      "button",
+      "details-btn",
+      "details"
+    );
+    let deleteBtn = dom.create(taskButtons, "button", "delete-btn", "delete");
 
     return {
       "button-group": taskButtons,
@@ -115,7 +110,8 @@ const domHandler = (function () {
 
     let detailsBtn = taskButtons["details-button"];
     detailsBtn.addEventListener("click", function (e) {
-      renderTaskDialog(task);
+      // renderTaskDialog(task);
+      testRenderDialog(task);
     });
 
     let deleteBtn = taskButtons["delete-button"];
@@ -131,68 +127,93 @@ const domHandler = (function () {
 
     return taskContainer;
   };
-
-  const renderTaskDialog = function (task) {
+  const testRenderDialog = function (task) {
     let dialog = document.createElement("dialog");
-    dialog.classList.add("task-dialog");
 
-    let taskDetails = document.createElement("div");
-    taskDetails.classList.add("task-details");
+    let taskTitle = dom.createInputLabel(
+      "text",
+      "dialog-task-title",
+      "Title: ",
+      task.title
+    );
 
-    let taskTitle = document.createElement("input");
-    taskTitle.value = task.title;
-    taskTitle.classList.add("dialog-title");
+    let taskDescription = dom.createTextAreaLabel(
+      "dialog-task-description",
+      "Description: ",
+      task.description
+    );
 
-    let taskDescription = document.createElement("textarea");
-    taskDescription.value = task.description;
-    taskDescription.classList.add("dialog-description");
+    let taskDueDate = dom.createInputLabel(
+      "date",
+      "dialog-task-dueDate",
+      "Due Date: ",
+      task.dueDate
+    );
 
-    let taskDueDate = document.createElement("input");
-    taskDueDate.type = "date";
-    taskDueDate.value = task.dueDate;
-    taskDueDate.classList.add("dialog-dueDate");
+    let taskPriority = dom.createSelect("Priority: ", [
+      "low",
+      "normal",
+      "high",
+    ]);
+    taskPriority.div.classList.add("dialog-task-priority");
+    taskPriority.select.value = task.priority;
 
-    let taskPriority = document.createElement("select");
+    let taskContainer = dom.create(dialog, "div", ".dialog-task-container");
+    dom.appendChildren(taskContainer, [
+      taskTitle.div,
+      taskDescription.div,
+      taskDueDate.div,
+      taskPriority.div,
+    ]);
 
-    let prioLow = document.createElement("option");
-    prioLow.value = "low";
-    prioLow.textContent = "low";
+    let btnGroup = dom.create(taskContainer, "div", ".dialog-button-group");
+    let saveBtn = dom.create(btnGroup, "button", "dialog-save-btn", "Save");
+    let closeBtn = dom.create(btnGroup, "button", "dialog-delete-btn", "Close");
 
-    let prioNormal = document.createElement("option");
-    prioNormal.value = "normal";
-    prioNormal.textContent = "normal";
-
-    let prioHigh = document.createElement("option");
-    prioHigh.value = "high";
-    prioHigh.textContent = "high";
-
-    taskPriority.appendChild(prioLow);
-    taskPriority.appendChild(prioNormal);
-    taskPriority.appendChild(prioHigh);
-
-    taskPriority.value = task.priority;
-    taskPriority.classList.add("dialog-priority");
-
-    taskDetails.appendChild(taskTitle);
-    taskDetails.appendChild(taskDescription);
-    taskDetails.appendChild(taskDueDate);
-    taskDetails.appendChild(taskPriority);
-
-    let saveBtn = document.createElement("button");
-    saveBtn.classList.add("dialog-close-btn");
-    saveBtn.textContent = "Save";
-
-    saveBtn.addEventListener("click", function () {
-      dialogSaveClose(
-        task,
-        dialog,
-        taskTitle,
-        taskDescription,
-        taskDueDate,
-        taskPriority
-      );
+    saveBtn.addEventListener("click", function (e) {
+      dialogSaveEvent(task, dialog, taskContainer);
     });
 
+    closeBtn.addEventListener("click", function (e) {
+      dialog.close();
+    });
+
+    dialog.appendChild(taskContainer);
+
+    document.body.appendChild(dialog);
+    dialog.showModal();
+  };
+
+  const dialogSaveEvent = function (task, dialog, container) {
+    let title = container.querySelector(".dialog-task-title input");
+    let description = container.querySelector(
+      ".dialog-task-description textarea"
+    );
+    let dueDate = container.querySelector(".dialog-task-dueDate input");
+    let priority = container.querySelector(".dialog-task-priority select");
+
+    let newTask = new Todo(
+      title.value,
+      description.value,
+      dueDate.value,
+      priority.value
+    );
+
+    if (todoValidator.validate(newTask)) {
+      task.title = newTask.title;
+      task.description = newTask.description;
+      task.dueDate = newTask.dueDate;
+      task.priority = newTask.priority;
+
+      dialog.close();
+      renderPage();
+    } else {
+      console.log("failed to update task");
+      dialog.close();
+    }
+  };
+
+  const outOfBoundsEvent = function (dialog) {
     dialog.addEventListener("click", function (e) {
       const dialogDimensions = dialog.getBoundingClientRect();
       if (
@@ -201,58 +222,10 @@ const domHandler = (function () {
         e.clientY < dialogDimensions.top ||
         e.clientY > dialogDimensions.bottom
       ) {
-        dialogSaveClose(
-          task,
-          dialog,
-          taskTitle,
-          taskDescription,
-          taskDueDate,
-          taskPriority
-        );
+        dialog.close();
       }
     });
-
-    dialog.append(taskDetails);
-    dialog.append(saveBtn);
-
-    document.body.appendChild(dialog);
-    dialog.showModal();
-    console.log(dialog);
   };
-
-  const dialogSaveClose = function (
-    task,
-    dialog,
-    taskTitle,
-    taskDescription,
-    taskDueDate,
-    taskPriority
-  ) {
-    let newTask = new Todo(
-      taskTitle.value,
-      taskDescription.value,
-      taskDueDate.value,
-      taskPriority.value
-    );
-
-    console.log(newTask);
-
-    if (todoValidator.validate(newTask)) {
-      task.title = newTask.title;
-      task.description = newTask.description;
-      task.dueDate = newTask.dueDate;
-      task.priority = newTask.priority;
-
-      console.log(`${task} updated successfully.`);
-      console.log(task, newTask);
-      dialog.close();
-    } else {
-      console.log("failed to update task");
-      dialog.close();
-    }
-    renderPage();
-  };
-
   const renderProjects = function () {
     const projectsContainer = document.querySelector(".projects-container");
     projectsContainer.replaceChildren();
