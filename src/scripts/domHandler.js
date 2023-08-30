@@ -5,52 +5,6 @@ import format from "date-fns/format";
 import { todoValidator } from "./validator";
 
 const domHandler = (function () {
-  const createForm = function () {
-    let button = document.createElement("input");
-    button.id = "submit-btn";
-    button.type = "submit";
-    button.value = "New Item";
-    const form = document.createElement("form");
-    form.id = "input-form";
-
-    let fields = [
-      { name: "title", type: "text" },
-      { name: "description", type: "text" },
-      {
-        name: "dueDate",
-        type: "date",
-        value: format(Date.now(), "yyyy-MM-dd"),
-      },
-    ];
-    let labels = ["Title:", "Description:", "Deadline:"];
-
-    fields.forEach((field, index) => {
-      let formItemContainer = document.createElement("div");
-      formItemContainer.classList.add("form-item");
-
-      let inputElement = document.createElement("input");
-      let labelElement = document.createElement("label");
-
-      inputElement.id = "input-" + field.name;
-      inputElement.type = field.type;
-      inputElement.setAttribute("name", "input-" + field.name);
-      if (field.value) {
-        inputElement.value = field.value;
-      }
-      labelElement.setAttribute("for", "input-" + field.name);
-      labelElement.textContent = labels[index];
-
-      formItemContainer.appendChild(labelElement);
-      formItemContainer.appendChild(inputElement);
-
-      form.appendChild(formItemContainer);
-    });
-
-    form.appendChild(button);
-
-    document.body.appendChild(form);
-  };
-
   const createProjects = function () {
     const projectsContainer = document.createElement("div");
     projectsContainer.classList.add("projects-container");
@@ -109,6 +63,7 @@ const domHandler = (function () {
         }
       });
       tasksContainer.insertBefore(taskDiv, tasksContainer.lastChild);
+      taskDiv.focus();
     });
   };
 
@@ -165,8 +120,10 @@ const domHandler = (function () {
 
     let deleteBtn = taskButtons["delete-button"];
     deleteBtn.addEventListener("click", function () {
-      project.removeTodoFromList(task);
-      renderPage();
+      if (confirm(`Are you sure yo want to delete "${task.title}"`)) {
+        project.removeTodoFromList(task);
+        renderPage();
+      }
     });
 
     taskContainer.appendChild(taskItem);
@@ -221,11 +178,11 @@ const domHandler = (function () {
     taskDetails.appendChild(taskDueDate);
     taskDetails.appendChild(taskPriority);
 
-    let closeBtn = document.createElement("button");
-    closeBtn.classList.add("dialog-close-btn");
-    closeBtn.textContent = "Close";
+    let saveBtn = document.createElement("button");
+    saveBtn.classList.add("dialog-close-btn");
+    saveBtn.textContent = "Save";
 
-    closeBtn.addEventListener("click", function () {
+    saveBtn.addEventListener("click", function () {
       dialogSaveClose(
         task,
         dialog,
@@ -256,7 +213,7 @@ const domHandler = (function () {
     });
 
     dialog.append(taskDetails);
-    dialog.append(closeBtn);
+    dialog.append(saveBtn);
 
     document.body.appendChild(dialog);
     dialog.showModal();
@@ -294,18 +251,6 @@ const domHandler = (function () {
       dialog.close();
     }
     renderPage();
-  };
-
-  const dialogClickOOB = function (e) {
-    const dialogDimensions = dialog.getBoundingClientRect();
-    if (
-      e.clientX < dialogDimensions.left ||
-      e.clientX > dialogDimensions.right ||
-      e.clientY < dialogDimensions.top ||
-      e.clientY > dialogDimensions.bottom
-    ) {
-      dialog.close();
-    }
   };
 
   const renderProjects = function () {
