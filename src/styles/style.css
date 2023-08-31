@@ -83,7 +83,6 @@ li {
 .dialog-task-priority {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1em;
 }
 
 .dialog-button-group {
@@ -118,7 +117,8 @@ body {
 button {
   background-color: #edb5bf;
 }
-button:hover {
+button:hover,
+button:focus {
   background-color: rgba(237, 181, 191, 0.5);
 }
 .project {
@@ -165,6 +165,17 @@ input:focus {
 
 dialog::backdrop {
   background-color: rgba(68, 68, 136, 0.5);
+}
+@keyframes animate-opacity {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+dialog[open] {
+  animation: animate-opacity 0.5s both;
 }
 
 /* typography */
