@@ -1,6 +1,6 @@
 import Todo from "./class/todo";
 import Project from "./class/project";
-import { Projects, projects } from "./class/projects";
+import { projects } from "./class/projects";
 import format from "date-fns/format";
 import { projectValidator, todoValidator } from "./validator";
 import { dom } from "./domHelpers";

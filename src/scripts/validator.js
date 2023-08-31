@@ -1,5 +1,3 @@
-import Todo from "./class/todo";
-
 const todoValidator = (function () {
   const validateDate = function (dateInput) {
     let date = new Date(dateInput);
