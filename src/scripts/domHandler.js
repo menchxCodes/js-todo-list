@@ -4,6 +4,7 @@ import { Projects, projects } from "./class/projects";
 import format from "date-fns/format";
 import { projectValidator, todoValidator } from "./validator";
 import { dom } from "./domHelpers";
+import { storage } from "./storage";
 
 const domHandler = (function () {
   const createProjects = function () {
@@ -316,7 +317,7 @@ const domHandler = (function () {
 
   const renderPage = function () {
     renderProjects();
-
+    storage.save(projects);
     console.log(projects);
   };
   return { createPage, renderPage };
